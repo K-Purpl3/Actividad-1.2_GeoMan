@@ -1,0 +1,45 @@
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+public class EjecutarComandosProcessBuilder {
+    public static void main(String[] args) {
+        try {
+            //detectar sistema operativo
+            String os = System.getProperty("os.name").toLowerCase();
+            List<String> comando = new ArrayList<>();
+
+            if(os.contains("win")) {
+                //windows
+                comando.add("cmd");
+                comando.add("/c");
+                comando.add("dir");
+            } else {
+                //linux o MacOS
+                comando.add("ls");
+                comando.add("-la");
+            }
+
+            //crear el ProcessBuilder
+            ProcessBuilder pb = new ProcessBuilder(comando);
+            pb.redirectErrorStream(true); //unir salida de error y salida normal
+            Process proceso = pb.start();
+
+            //leer la salida del comando
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+            String linea;
+            while((linea = reader.readLine()) != null) {
+                System.out.println(linea);
+            }
+
+            //esperar a que termine
+            int codigoSalida = proceso.waitFor();
+            System.out.println("\ncodigo de salida: " + codigoSalida);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
